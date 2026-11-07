@@ -9,6 +9,11 @@
     "/api/airdrops": {
       "get": {
         "summary": "Get latest crypto airdrops and active tasks",
+        "x-payment-info": {
+          "network": "eip155:8453",
+          "asset": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+          "amount": "10000"
+        },
         "responses": {
           "200": {
             "description": "Successful response with active airdrop data",

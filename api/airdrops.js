@@ -24,7 +24,7 @@ export default async function handler(req, res) {
   const paymentProof = req.headers["authorization"] || req.headers["payment-required"];
 
   if (!paymentProof) {
-    // 2. Jika belum bayar, tolak dengan HTTP 402 + Spesifikasi x402 v2
+    // 2. Jika belum bayar, tolak dengan HTTP 402 + Spesifikasi x402 v2 & Bazaar Extension
     const offer = {
       x402Version: 2,
       resource: {
@@ -45,7 +45,24 @@ export default async function handler(req, res) {
             version: "2"
           }
         }
-      ]
+      ],
+      extensions: {
+        bazaar: {
+          info: {
+            title: "Airdrop & Task Intelligence API",
+            description: "Live daily crypto airdrops and task intelligence feed"
+          },
+          schema: {
+            response: {
+              type: "object",
+              properties: {
+                status: { type: "string" },
+                airdrops: { type: "array" }
+              }
+            }
+          }
+        }
+      }
     };
 
     // Set Payment-Required header sebagai Base64 JSON (standar x402 v2 transport)

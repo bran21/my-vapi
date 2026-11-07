@@ -1,0 +1,9 @@
+{
+  "resources": [
+    {
+      "url": "https://vapi-rust.vercel.app/api/airdrops",
+      "description": "Live daily crypto airdrops and task intelligence feed",
+      "mimeType": "application/json"
+    }
+  ]
+}
