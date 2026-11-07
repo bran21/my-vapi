@@ -8,10 +8,9 @@ const PAYOUT_WALLET = "0x22c90e068ab8a1cb07eb57c7efb439e768996654";
 const USDC_BASE = "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913";
 
 export default async function handler(req, res) {
-  // Atur CORS header agar API bisa dipanggil oleh frontend/agent mana pun
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "GET, OPTIONS");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization, Payment-Required");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization, Payment-Required, WWW-Authenticate");
 
   if (req.method === "OPTIONS") {
     return res.status(200).end();
@@ -25,28 +24,39 @@ export default async function handler(req, res) {
   const paymentProof = req.headers["authorization"] || req.headers["payment-required"];
 
   if (!paymentProof) {
-    // 2. Jika belum bayar, tolak dengan HTTP 402 + Spesifikasi x402
-    return res.status(402).json({
-      x402Version: 1,
+    // 2. Jika belum bayar, tolak dengan HTTP 402 + Spesifikasi x402 v2
+    const offer = {
+      x402Version: 2,
+      resource: {
+        url: resourceUrl,
+        description: "Live daily crypto airdrops and task intelligence feed",
+        mimeType: "application/json"
+      },
       accepts: [
         {
           scheme: "exact",
           network: "eip155:8453",
-          maxAmountRequired: "10000", // $0.01 USDC on Base
-          resource: resourceUrl,
-          description: "Live daily crypto airdrops and task intelligence feed",
-          mimeType: "application/json",
+          amount: "10000", // $0.01 USDC on Base
+          asset: USDC_BASE,
           payTo: PAYOUT_WALLET,
           maxTimeoutSeconds: 60,
-          asset: USDC_BASE
+          extra: {
+            name: "USD Coin",
+            version: "2"
+          }
         }
       ]
-    });
+    };
+
+    // Set Payment-Required header sebagai Base64 JSON (standar x402 v2 transport)
+    const headerValue = Buffer.from(JSON.stringify(offer)).toString("base64");
+    res.setHeader("Payment-Required", headerValue);
+
+    return res.status(402).json(offer);
   }
 
   // 3. Jika pembayaran sudah diproses oleh protokol vAPI:
   try {
-    // Ambil data live feed terbaru
     const feedRes = await fetch("https://airdropalert.com/feed/rssfeed", {
       headers: { "User-Agent": "Mozilla/5.0" }
     });
