@@ -1,0 +1,20 @@
+{
+  "name": "vapi-airdrop-x402-api",
+  "version": "1.0.0",
+  "description": "x402 Airdrop & Task Intelligence API for vAPI Network and Vercel",
+  "type": "module",
+  "main": "api/airdrops.js",
+  "scripts": {
+    "start": "node airdrop-finder.mjs"
+  },
+  "keywords": [
+    "x402",
+    "vapi",
+    "airdrop",
+    "crypto",
+    "base",
+    "usdc",
+    "vercel"
+  ],
+  "license": "MIT"
+}
